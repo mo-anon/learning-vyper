@@ -72,8 +72,30 @@ def get_price_oracle(_controller: address) -> uint256:
 # Controller
 @external
 @view
-def get_total_debt(_controller: address) -> uint256:
+def get_controller_debt(_controller: address) -> uint256:
+    """
+    @notice get total user debt of a controller/market
+    @param _controller Controller address
+    @return user debt of controller/market
+    """
     return Controller(_controller).total_debt()
+
+@external
+@view
+def get_total_user_debt() -> uint256:
+    """
+    @notice get total user debt across all controllers/markets
+    @return total user debt
+    """
+    total: uint256 = 0
+    n: int128 = self.n_controller
+    for i in range(0, 999):
+        if i < n:
+            debt: uint256 = Controller(self.controller[i]).total_debt()
+            total += debt
+        else:
+            break
+    return total
 
 
 @external
@@ -105,7 +127,7 @@ def get_total_unclaimed_admin_fees() -> uint256:
 
 
 
-# Others
+# adding componenets
 @external
 def add_controller(_controller: address) -> bool:
     """
@@ -147,6 +169,8 @@ def add_monetary_policy(_monetary_policy: address) -> bool:
     self.monetary_policy[self.n_monetary_policy] = _monetary_policy
     self.n_monetary_policy += 1  
     return True
+
+
 
 
 # Ownership
